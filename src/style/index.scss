@@ -1,0 +1,17 @@
+html,#app {
+  font-size: 16px;
+  overflow-scrolling: touch;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cl {
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+a {
+  color: inherit;
+}
