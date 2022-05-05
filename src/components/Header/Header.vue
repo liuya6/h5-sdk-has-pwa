@@ -24,10 +24,6 @@ export default class Header extends Vue {
   back() {
     return this.$router.back();
   }
-
-  created() {
-    console.log(this.title, "title");
-  }
 }
 </script>
 

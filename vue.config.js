@@ -40,6 +40,25 @@ module.exports = defineConfig({
       patterns: [path.resolve(__dirname, `./src/style/theme/index.scss`)],
     },
   },
+
+  pwa: {
+    name: "PWA",
+    themeColor: "#000000",
+    msTileColor: "#000000",
+    appleMobileWebAppCapable: "yes",
+    appleMobileWebAppStatusBarStyle: "black",
+    manifestOptions: {
+      display: "standalone",
+    },
+    workboxPluginMode: "InjectManifest",
+    workboxOptions: {
+      exclude: [/\.*/],
+      swSrc: "public/service-worker.js",
+      importWorkboxFrom: "disabled",
+      // swDest: "service-worker.js",
+    },
+  },
+
   devServer: {
     proxy: {
       "/api": {

@@ -6,8 +6,91 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title><%= htmlWebpackPlugin.options.title %></title>
+    <style>
+      #loading {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        z-index: 9999;
+        background-color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition-duration: 0.5s;
+      }
+
+      #loading.hide {
+        visibility: hidden;
+        opacity: 0;
+        overflow: hidden;
+      }
+
+      .pulse {
+        height: 100%;
+        width: 100%;
+        background: linear-gradient(-90deg, #efefef 0%, #fcfcfc 50%, #efefef 100%);
+        background-size: 400% 400%;
+        -webkit-animation: pulse 1.2s ease-in-out infinite;
+        animation: pulse 1.2s ease-in-out infinite;
+      }
+      @-webkit-keyframes pulse {
+        0% {
+          background-position: 0% 0%;
+        }
+        100% {
+          background-position: -135% 0%;
+        }
+      }
+      @keyframes pulse {
+        0% {
+          background-position: 0% 0%;
+        }
+        100% {
+          background-position: -135% 0%;
+        }
+      }
+      .lines {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-direction: column;
+      }
+      .lines .line,
+      .lines .thumb {
+        background-color: #f5f5f5;
+        width: 15rem;
+        height: 0.6rem;
+        margin: 0.25rem;
+      }
+      .lines .thumb {
+        height: 7.5rem;
+      }
+    </style>
   </head>
   <body>
+    <div id="loading">
+      <div class="lines">
+        <div class="line pulse"></div>
+        <div class="thumb pulse"></div>
+        <div class="line pulse"></div>
+        <div class="line pulse"></div>
+        <div class="line pulse"></div>
+        <div class="line pulse"></div>
+        <div class="line pulse"></div>
+        <div class="line pulse"></div>
+        <div class="line pulse"></div>
+        <div class="line pulse"></div>
+        <div class="line pulse"></div>
+        <div class="line pulse"></div>
+        <div class="line pulse"></div>
+        <div class="line pulse"></div>
+        <div class="line pulse"></div>
+        <div class="line pulse"></div>
+      </div>
+    </div>
     <noscript>
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>

@@ -9,8 +9,10 @@ import "./style/index.scss";
 // 注册三方库
 import "@/plugins/vant";
 
-import App from "./App.vue";
+// service worker
 import "./registerServiceWorker";
+
+import App from "./App.vue";
 import router from "./router";
 import store from "./store";
 

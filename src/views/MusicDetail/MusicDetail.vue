@@ -1,20 +1,20 @@
 <template>
   <div class="musicDetails">
-    <Skeleton :row="27" :loading="loading">
-      <div class="musicHeader">
-        <div
-          :class="{
-            top: true,
-            fixed: topFixedFlag,
-          }"
-          @click="$router.back()"
-          ref="topEl"
-        >
-          <span class="iconfont"> ㄑ </span>
-          {{ musicListData.title }}
-        </div>
-        <img v-lazy="musicListData.bg" alt="" />
+    <div class="musicHeader">
+      <div
+        :class="{
+          top: true,
+          fixed: topFixedFlag,
+        }"
+        @click="$router.back()"
+        ref="topEl"
+      >
+        <span class="iconfont"> ㄑ </span>
+        歌单
       </div>
+      <img v-lazy="musicListData.bg" alt="" />
+    </div>
+    <Skeleton :row="27" :loading="loading">
       <div
         class="content"
         v-if="musicListData.list && musicListData.list.length"
@@ -44,7 +44,7 @@ import { MusicDetailsApi } from "@/api";
   },
 })
 export default class MusicDetails extends Vue {
-  topFixedFlag = false;
+  topFixedFlag = true;
   musicListData = {};
   musicDetailData = {
     playlist: {} as any,
@@ -88,6 +88,7 @@ export default class MusicDetails extends Vue {
     this.musicDetailData.recommend = result.privileges;
     this.musicDetailData.playlist = result.playlist;
     this.musicListData = this.getMusicListData();
+    this.topFixedFlag = false;
   }
 
   getMusicListData() {
