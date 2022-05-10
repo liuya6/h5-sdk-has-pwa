@@ -2,8 +2,12 @@ importScripts(
   "https://storage.googleapis.com/workbox-cdn/releases/4.2.0/workbox-sw.js"
 );
 
+console.log(workbox, "->>workbox");
+
 if (workbox) {
-  console.log(workbox, "workbox");
+  workbox.setConfig({ debug: false });
+
+  console.log("come in workbox");
   // Workbox 加载完成
 
   workbox.core.setCacheNameDetails({
@@ -16,14 +20,16 @@ if (workbox) {
   workbox.precaching.precacheAndRoute([
     {
       url: "/index.html",
-      revision: "5ed70e0c237b4c66",
+      revision: "1.0.0",
     },
   ]);
+
+  // 删除所有log
 
   // 一旦激活就开始控制任何现有客户机（通常是与skipWaiting配合使用）
   workbox.core.clientsClaim();
   // 跳过等待期
-  workbox.core.skipWaiting();
+  // workbox.core.skipWaiting();
   // 删除过期缓存
   workbox.precaching.cleanupOutdatedCaches();
 
@@ -43,7 +49,7 @@ if (workbox) {
           // 最大缓存数量
           maxEntries: 20,
           // 缓存时间12小时
-          maxAgeSeconds: 12 * 60 * 60,
+          maxAgeSeconds: 1 * 60 * 60,
         }),
       ],
     }),
