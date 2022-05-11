@@ -2,9 +2,27 @@ importScripts(
   "https://storage.googleapis.com/workbox-cdn/releases/4.2.0/workbox-sw.js"
 );
 
-console.log(workbox, "->>workbox");
-
 if (workbox) {
+  // console.log(self, "???");
+  // self.addEventListener("swUpdate", (value) => {
+  //   console.log(value, "!!!");
+  // });
+
+  self.addEventListener("message", (event) => {
+    console.log(event, "!!!");
+    const replyPort = event.ports[0];
+    const message = event.data;
+    if (replyPort && message && message.type === "skip-waiting") {
+      event.waitUntil(
+        self
+          .skipWaiting()
+          .then(() => replyPort.postMessage({ error: null }))
+          .catch((error) => replyPort.postMessage({ error }))
+      );
+    }
+  });
+
+  // 删除所有log
   workbox.setConfig({ debug: false });
 
   console.log("come in workbox");
@@ -24,12 +42,11 @@ if (workbox) {
     },
   ]);
 
-  // 删除所有log
-
-  // 一旦激活就开始控制任何现有客户机（通常是与skipWaiting配合使用）
-  workbox.core.clientsClaim();
   // 跳过等待期
   // workbox.core.skipWaiting();
+  // 一旦激活就开始控制任何现有客户机（通常是与skipWaiting配合使用）
+  workbox.core.clientsClaim();
+
   // 删除过期缓存
   workbox.precaching.cleanupOutdatedCaches();
 

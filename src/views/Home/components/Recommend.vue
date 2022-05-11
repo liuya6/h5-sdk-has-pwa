@@ -15,7 +15,7 @@
       </div>
 
       <div class="content">
-        <h1>推荐歌单</h1>
+        <h1>推荐歌单 {{ version }}</h1>
         <ul>
           <li
             v-for="item in playlists"
@@ -48,6 +48,7 @@ import { Vue, Component } from "vue-property-decorator";
 import { Swipe, SwipeItem, Skeleton } from "vant";
 
 import { HomeApi } from "@/api";
+import { version } from "@/main";
 
 @Component({
   components: {
@@ -61,6 +62,7 @@ export default class Recommend extends Vue {
   playlists = [];
 
   loading = false;
+  version = version;
 
   created() {
     this.initData();

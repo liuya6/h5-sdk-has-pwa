@@ -8,8 +8,6 @@ const cacheVersion =
     : Date.now();
 
 if ("serviceWorker" in navigator) {
-  console.log("come in registerServiceWorker");
-
   register(
     `${process.env.BASE_URL}service-worker.js?cacheVersion=${cacheVersion}`,
     {
@@ -19,7 +17,10 @@ if ("serviceWorker" in navigator) {
             "查看更多, 访问 https://goo.gl/AFskqB"
         );
       },
-      registered() {
+      registered(reg) {
+        if (reg.waiting) {
+          return;
+        }
         Notify({
           type: "success",
           message: "service worker 已注册",
@@ -33,20 +34,27 @@ if ("serviceWorker" in navigator) {
         });
       },
       updatefound() {
-        Notify({
-          type: "success",
-          message: "service worker 正在下载新内容",
-        });
+        // Notify({
+        //   type: "success",
+        //   message: "service worker 正在下载新内容",
+        // });
+        console.log("service worker 正在下载新内容");
       },
-      updated() {
+      updated(registration) {
+        console.log(registration, "registration???");
         Dialog.confirm({
           title: "提示",
           message: "有新内容可用；请刷新。",
         }).then((res) => {
-          console.log(res);
+          navigator.serviceWorker
+            .getRegistration()
+            .then((reg) => {
+              skipWaiting(registration);
+            })
+            .then(() => {
+              window.location.reload();
+            });
         });
-
-        console.log("有新内容可用；请刷新。");
       },
       offline() {
         Notify({
@@ -59,7 +67,29 @@ if ("serviceWorker" in navigator) {
           type: "danger",
           message: `Service Worker 注册期间的错误：${error}`,
         });
+        unregister(); // 注册期间失败直接卸载sw
       },
     }
   );
+}
+
+function skipWaiting(registration: any) {
+  console.log(registration, "registration");
+  const worker = registration.waiting;
+  if (!worker) {
+    return Promise.resolve();
+  }
+  // 这里是参考vue-press的写法
+  // 利用MessageChannel返回一个promise
+  return new Promise((resolve, reject) => {
+    const channel = new MessageChannel();
+    channel.port1.onmessage = (event) => {
+      if (event.data.error) {
+        reject(event.data.error);
+      } else {
+        resolve(event.data);
+      }
+    };
+    worker.postMessage({ type: "skip-waiting" }, [channel.port2]);
+  });
 }

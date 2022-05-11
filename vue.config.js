@@ -63,24 +63,6 @@ module.exports = defineConfig({
     },
   },
 
-  pwa: {
-    name: "PWA",
-    themeColor: "#000000",
-    msTileColor: "#000000",
-    appleMobileWebAppCapable: "yes",
-    appleMobileWebAppStatusBarStyle: "black",
-    manifestOptions: {
-      display: "standalone",
-    },
-    workboxPluginMode: "InjectManifest",
-    workboxOptions: {
-      exclude: [/\.*/],
-      swSrc: "public/service-worker.js",
-      importWorkboxFrom: "local",
-      // swDest: "service-worker.js",
-    },
-  },
-
   devServer: {
     proxy: {
       "/api": {

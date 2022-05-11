@@ -18,6 +18,8 @@ import store from "./store";
 
 Vue.config.productionTip = false;
 
+export const version = "v1.0.0";
+
 new Vue({
   router,
   store,
