@@ -48,50 +48,52 @@ if (workbox) {
   workbox.precaching.cleanupOutdatedCaches();
 
   // html的缓存策略
-  workbox.routing.registerRoute(
-    new RegExp("/"),
-    new workbox.strategies.NetworkFirst({
-      // 缓存自定义名称
-      cacheName: "html-caches",
-      plugins: [
-        // 需要缓存的状态筛选
-        new workbox.cacheableResponse.Plugin({
-          statuses: [0, 200],
-        }),
-        // 缓存时间（秒）
-        new workbox.expiration.Plugin({
-          // 最大缓存数量
-          maxEntries: 20,
-          // 缓存时间12小时
-          maxAgeSeconds: 12 * 60 * 60,
-        }),
-      ],
-    }),
-    "GET"
-  );
-
-  // js css的缓存策略
   // workbox.routing.registerRoute(
-  //   new RegExp("/js/.*.(?:js|css)"),
-  //   workbox.strategies.staleWhileRevalidate({
-  //     cacheName: "js-css-caches",
+  //   new RegExp("/"),
+  //   new workbox.strategies.NetworkFirst({
+  //     // 缓存自定义名称
+  //     cacheName: "html-caches",
   //     plugins: [
   //       // 需要缓存的状态筛选
   //       new workbox.cacheableResponse.Plugin({
   //         statuses: [0, 200],
   //       }),
-  //       // 缓存时间
+  //       // 缓存时间（秒）
   //       new workbox.expiration.Plugin({
+  //         // 最大缓存数量
   //         maxEntries: 20,
-  //         maxAgeSeconds: 60 * 60,
+  //         // 缓存时间12小时
+  //         maxAgeSeconds: 12 * 60 * 60,
   //       }),
   //     ],
-  //   })
+  //   }),
+  //   "GET"
   // );
+
+  // js css的缓存策略
+  workbox.routing.registerRoute(
+    /.*.(?:js|css|json|ico)/,
+    workbox.strategies.staleWhileRevalidate({
+      cacheName: "js-css-json-ico-caches",
+      plugins: [
+        // 需要缓存的状态筛选
+        new workbox.cacheableResponse.Plugin({
+          statuses: [0, 200],
+        }),
+        // 缓存时间
+        new workbox.expiration.Plugin({
+          maxEntries: 20,
+          maxAgeSeconds: 60 * 60,
+        }),
+      ],
+    })
+  );
 
   workbox.routing.registerRoute(
     /\/api/,
     new workbox.strategies.NetworkFirst({
+      // 可能存在一些网络请求，他们花费的时间很长，那么通过一些配置，让任何在超时内无法响应的网络请求都强制回退到缓存获取。
+      networkTimeoutSeconds: 5,
       cacheName: "api-caches",
       plugins: [
         // 需要缓存的状态筛选
@@ -110,7 +112,7 @@ if (workbox) {
   workbox.routing.registerRoute(
     /\.(jpe?g|png|svg)/,
     new workbox.strategies.CacheFirst({
-      cacheName: "image-runtime-cache",
+      cacheName: "image-cache",
       fetchOptions: {
         mode: "cors",
       },
