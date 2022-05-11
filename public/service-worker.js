@@ -3,10 +3,7 @@ importScripts(
 );
 
 if (workbox) {
-  // console.log(self, "???");
-  // self.addEventListener("swUpdate", (value) => {
-  //   console.log(value, "!!!");
-  // });
+  console.log("come in workbox");
 
   self.addEventListener("message", (event) => {
     console.log(event, "!!!");
@@ -25,7 +22,6 @@ if (workbox) {
   // 删除所有log
   workbox.setConfig({ debug: false });
 
-  console.log("come in workbox");
   // Workbox 加载完成
 
   workbox.core.setCacheNameDetails({
@@ -35,12 +31,12 @@ if (workbox) {
     runtime: "runtime",
   });
   // 预缓存
-  workbox.precaching.precacheAndRoute([
-    {
-      url: "/index.html",
-      revision: "1.0.0",
-    },
-  ]);
+  // workbox.precaching.precacheAndRoute([
+  //   {
+  //     url: "/index.html",
+  //     revision: "1.0.0",
+  //   },
+  // ]);
 
   // 跳过等待期
   // workbox.core.skipWaiting();
