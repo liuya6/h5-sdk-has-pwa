@@ -19,7 +19,8 @@ if ("serviceWorker" in navigator) {
         );
       },
       registered(registration) {
-        if (process.env.NODE_ENV === "production") {
+        const worker = registration.waiting;
+        if (process.env.NODE_ENV === "production" && worker) {
           Dialog.confirm({
             title: "提示",
             message: "有新内容可用；请刷新。",
