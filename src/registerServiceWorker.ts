@@ -8,6 +8,7 @@ const cacheVersion =
     : Date.now();
 
 if ("serviceWorker" in navigator) {
+  // unregister();
   register(
     `${process.env.BASE_URL}service-worker.js?cacheVersion=${cacheVersion}`,
     {
@@ -17,15 +18,30 @@ if ("serviceWorker" in navigator) {
             "查看更多, 访问 https://goo.gl/AFskqB"
         );
       },
-      registered(reg) {
-        if (reg.waiting) {
+      registered(registration) {
+        if (process.env.NODE_ENV === "production") {
+          Dialog.confirm({
+            title: "提示",
+            message: "有新内容可用；请刷新。",
+          }).then(() => {
+            navigator.serviceWorker
+              .getRegistration()
+              .then(() => {
+                skipWaiting(registration);
+              })
+              .then(() => {
+                window.location.reload();
+              });
+          });
+        }
+
+        if (registration.waiting) {
           return;
         }
         Notify({
           type: "success",
           message: "service worker 已注册",
         });
-        console.log("service worker 已注册");
       },
       cached() {
         Notify({
@@ -40,21 +56,8 @@ if ("serviceWorker" in navigator) {
         // });
         console.log("service worker 正在下载新内容");
       },
-      updated(registration) {
-        console.log(registration, "registration???");
-        Dialog.confirm({
-          title: "提示",
-          message: "有新内容可用；请刷新。",
-        }).then((res) => {
-          navigator.serviceWorker
-            .getRegistration()
-            .then((reg) => {
-              skipWaiting(registration);
-            })
-            .then(() => {
-              window.location.reload();
-            });
-        });
+      updated() {
+        console.log("updated");
       },
       offline() {
         Notify({
@@ -67,14 +70,14 @@ if ("serviceWorker" in navigator) {
           type: "danger",
           message: `Service Worker 注册期间的错误：${error}`,
         });
-        unregister(); // 注册期间失败直接卸载sw
+        // unregister(); // 注册期间失败直接卸载sw
+        console.log(error, "error");
       },
     }
   );
 }
 
 function skipWaiting(registration: any) {
-  console.log(registration, "registration");
   const worker = registration.waiting;
   if (!worker) {
     return Promise.resolve();

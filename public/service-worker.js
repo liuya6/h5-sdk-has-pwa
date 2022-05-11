@@ -30,13 +30,14 @@ if (workbox) {
     precache: "precache",
     runtime: "runtime",
   });
+
   // 预缓存
-  // workbox.precaching.precacheAndRoute([
-  //   {
-  //     url: "/index.html",
-  //     revision: "1.0.0",
-  //   },
-  // ]);
+  workbox.precaching.precacheAndRoute([
+    {
+      url: "/index.html",
+      revision: "1.0.0",
+    },
+  ]);
 
   // 跳过等待期
   // workbox.core.skipWaiting();
@@ -62,7 +63,7 @@ if (workbox) {
           // 最大缓存数量
           maxEntries: 20,
           // 缓存时间12小时
-          maxAgeSeconds: 1 * 60 * 60,
+          maxAgeSeconds: 12 * 60 * 60,
         }),
       ],
     }),
@@ -70,23 +71,23 @@ if (workbox) {
   );
 
   // js css的缓存策略
-  workbox.routing.registerRoute(
-    new RegExp(".*.(?:js|css)"),
-    workbox.strategies.cacheFirst({
-      cacheName: "js-css-caches",
-      plugins: [
-        // 需要缓存的状态筛选
-        new workbox.cacheableResponse.Plugin({
-          statuses: [0, 200],
-        }),
-        // 缓存时间
-        new workbox.expiration.Plugin({
-          maxEntries: 20,
-          maxAgeSeconds: 12 * 60 * 60,
-        }),
-      ],
-    })
-  );
+  // workbox.routing.registerRoute(
+  //   new RegExp("/js/.*.(?:js|css)"),
+  //   workbox.strategies.staleWhileRevalidate({
+  //     cacheName: "js-css-caches",
+  //     plugins: [
+  //       // 需要缓存的状态筛选
+  //       new workbox.cacheableResponse.Plugin({
+  //         statuses: [0, 200],
+  //       }),
+  //       // 缓存时间
+  //       new workbox.expiration.Plugin({
+  //         maxEntries: 20,
+  //         maxAgeSeconds: 60 * 60,
+  //       }),
+  //     ],
+  //   })
+  // );
 
   workbox.routing.registerRoute(
     /\/api/,
@@ -107,7 +108,7 @@ if (workbox) {
   );
 
   workbox.routing.registerRoute(
-    /\.(jpe?g|png)/,
+    /\.(jpe?g|png|svg)/,
     new workbox.strategies.CacheFirst({
       cacheName: "image-runtime-cache",
       fetchOptions: {
