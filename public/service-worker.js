@@ -1,6 +1,11 @@
+// importScripts(
+//   "https://storage.googleapis.com/workbox-cdn/releases/4.2.0/workbox-sw.js"
+// );
 importScripts(
-  "https://storage.googleapis.com/workbox-cdn/releases/4.2.0/workbox-sw.js"
+  "https://cdn.bootcdn.net/ajax/libs/workbox-sw/6.5.3/workbox-sw.min.js"
 );
+
+console.log(workbox, "workbox");
 
 if (workbox) {
   console.log("come in workbox");
@@ -73,15 +78,15 @@ if (workbox) {
   // js css的缓存策略
   workbox.routing.registerRoute(
     /.*.(?:js|css|json|ico)/,
-    workbox.strategies.staleWhileRevalidate({
+    new workbox.strategies.StaleWhileRevalidate({
       cacheName: "js-css-json-ico-caches",
       plugins: [
         // 需要缓存的状态筛选
-        new workbox.cacheableResponse.Plugin({
-          statuses: [0, 200],
+        new workbox.cacheableResponse.CacheableResponsePlugin({
+          statuses: [0, 200, 304],
         }),
         // 缓存时间
-        new workbox.expiration.Plugin({
+        new workbox.expiration.ExpirationPlugin({
           maxEntries: 20,
           maxAgeSeconds: 60 * 60,
         }),
@@ -93,17 +98,19 @@ if (workbox) {
     /\/api/,
     new workbox.strategies.NetworkFirst({
       // 可能存在一些网络请求，他们花费的时间很长，那么通过一些配置，让任何在超时内无法响应的网络请求都强制回退到缓存获取。
-      networkTimeoutSeconds: 5,
+      networkTimeoutSeconds: 10,
       cacheName: "api-caches",
       plugins: [
         // 需要缓存的状态筛选
-        new workbox.cacheableResponse.Plugin({
+        new workbox.cacheableResponse.CacheableResponsePlugin({
           statuses: [0, 200],
         }),
         // 缓存时间
-        new workbox.expiration.Plugin({
-          maxEntries: 20,
-          maxAgeSeconds: 12 * 60 * 60,
+        new workbox.expiration.ExpirationPlugin({
+          // 缓存最多50个请求
+          maxEntries: 50,
+          // 缓存一小时
+          maxAgeSeconds: 60 * 60,
         }),
       ],
     })
@@ -117,7 +124,7 @@ if (workbox) {
         mode: "cors",
       },
       plugins: [
-        new workbox.expiration.Plugin({
+        new workbox.expiration.ExpirationPlugin({
           // 对图片资源缓存 1 星期
           maxAgeSeconds: 7 * 24 * 60 * 60,
           // 匹配该策略的图片最多缓存 10 张
@@ -127,3 +134,6 @@ if (workbox) {
     })
   );
 }
+
+// 1 sw怎么删除所有缓存
+// 2 workbox怎么导入
