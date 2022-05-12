@@ -2,10 +2,11 @@ import { register, unregister } from "register-service-worker";
 
 import { Dialog, Notify } from "vant";
 
-const cacheVersion =
-  process.env.NODE_ENV === "production"
-    ? process.env.CACHE_VERSION
-    : Date.now();
+// const cacheVersion =
+//   process.env.NODE_ENV === "production"
+//     ? process.env.CACHE_VERSION
+//     : Date.now();
+const cacheVersion = "v1.0.92";
 
 if ("serviceWorker" in navigator) {
   // unregister();
@@ -19,23 +20,6 @@ if ("serviceWorker" in navigator) {
         );
       },
       registered(registration) {
-        const worker = registration.waiting;
-        if (process.env.NODE_ENV === "production" && worker) {
-          Dialog.confirm({
-            title: "提示",
-            message: "有新内容可用；请刷新。",
-          }).then(() => {
-            navigator.serviceWorker
-              .getRegistration()
-              .then(() => {
-                skipWaiting(registration);
-              })
-              .then(() => {
-                window.location.reload();
-              });
-          });
-        }
-
         if (registration.waiting) {
           return;
         }
@@ -57,8 +41,50 @@ if ("serviceWorker" in navigator) {
         // });
         console.log("service worker 正在下载新内容");
       },
-      updated() {
-        console.log("updated");
+      updated(registration) {
+        const worker = registration.waiting;
+        console.log(worker?.scriptURL, worker?.state, "worker");
+        if (worker) {
+          const url = new URL(worker?.scriptURL);
+          const params = new URLSearchParams(url.search);
+          const cacheVersion = params.get("cacheVersion") || "";
+
+          const oldCacheVersion = window.localStorage.getItem("cacheVersion");
+
+          if (cacheVersion === oldCacheVersion) return;
+          console.log(cacheVersion);
+
+          Dialog.confirm({
+            title: "提示",
+            message: "有新内容可用；请刷新。",
+          }).then(() => {
+            navigator.serviceWorker
+              .getRegistration()
+              .then(() => {
+                skipWaiting(registration);
+                window.localStorage.setItem("cacheVersion", cacheVersion);
+              })
+              .then(() => {
+                window.location.reload();
+              });
+          });
+        }
+
+        // if (process.env.NODE_ENV === "production" && worker) {
+        //   Dialog.confirm({
+        //     title: "提示",
+        //     message: "有新内容可用；请刷新。",
+        //   }).then(() => {
+        //     navigator.serviceWorker
+        //       .getRegistration()
+        //       .then(() => {
+        //         skipWaiting(registration);
+        //       })
+        //       .then(() => {
+        //         window.location.reload();
+        //       });
+        //   });
+        // }
       },
       offline() {
         Notify({

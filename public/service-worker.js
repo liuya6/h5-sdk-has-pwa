@@ -60,11 +60,11 @@ if (workbox) {
   //     cacheName: "html-caches",
   //     plugins: [
   //       // 需要缓存的状态筛选
-  //       new workbox.cacheableResponse.Plugin({
+  //       new workbox.CacheableResponsePlugin({
   //         statuses: [0, 200],
   //       }),
   //       // 缓存时间（秒）
-  //       new workbox.expiration.Plugin({
+  //       new workbox.ExpirationPlugin({
   //         // 最大缓存数量
   //         maxEntries: 20,
   //         // 缓存时间12小时
@@ -131,6 +131,20 @@ if (workbox) {
           // maxEntries: 10,
         }),
       ],
+    })
+  );
+
+  workbox.routing.registerRoute(
+    /^https:\/\/p2.music.126\.net\/.*\.(jpe?g|png)/,
+    new workbox.strategies.CacheFirst({
+      cacheName: "cors-image-cache",
+      fetchOptions: {
+        mode: "cors",
+      },
+      // 假设图片资源缓存的存取需要忽略请求 URL 的 search 参数，可以通过设置 matchOptions 来实现
+      matchOptions: {
+        ignoreSearch: true,
+      },
     })
   );
 }
