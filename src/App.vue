@@ -3,7 +3,7 @@ import { Vue, Component } from "vue-property-decorator";
 
 @Component
 export default class App extends Vue {
-  created() {
+  mounted() {
     this.hideLoading();
   }
 
@@ -16,12 +16,10 @@ export default class App extends Vue {
   }
 
   hideLoading() {
-    setTimeout(() => {
-      const loadingDom = document.querySelector("#loading");
-      if (loadingDom) {
-        loadingDom.classList.add("hide");
-      }
-    }, 500);
+    const loadingDom = document.querySelector("#loading");
+    if (loadingDom) {
+      loadingDom.classList.add("hide");
+    }
   }
 }
 </script>
