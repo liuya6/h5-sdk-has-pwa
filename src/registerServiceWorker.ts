@@ -2,11 +2,7 @@ import { register, unregister } from "register-service-worker";
 
 import { Dialog, Notify } from "vant";
 
-// const cacheVersion =
-//   process.env.NODE_ENV === "production"
-//     ? process.env.CACHE_VERSION
-//     : Date.now();
-const cacheVersion = "v1.0.92";
+const cacheVersion = "v1.1.1";
 
 if ("serviceWorker" in navigator) {
   // unregister();
@@ -43,16 +39,10 @@ if ("serviceWorker" in navigator) {
       },
       updated(registration) {
         const worker = registration.waiting;
-        console.log(worker?.scriptURL, worker?.state, "worker");
         if (worker) {
-          const url = new URL(worker?.scriptURL);
-          const params = new URLSearchParams(url.search);
-          const cacheVersion = params.get("cacheVersion") || "";
-
-          const oldCacheVersion = window.localStorage.getItem("cacheVersion");
-
+          const { cacheVersion, oldCacheVersion } = getNewAndOldVersion(worker);
+          // 要更新的sw版本和正在使用的sw版本一致就return出去
           if (cacheVersion === oldCacheVersion) return;
-          console.log(cacheVersion);
 
           Dialog.confirm({
             title: "提示",
@@ -61,6 +51,9 @@ if ("serviceWorker" in navigator) {
             navigator.serviceWorker
               .getRegistration()
               .then(() => {
+                // 如果有新版本，就先清空缓存
+                clearCache();
+                // 直接启用新版本sw
                 skipWaiting(registration);
                 window.localStorage.setItem("cacheVersion", cacheVersion);
               })
@@ -69,22 +62,6 @@ if ("serviceWorker" in navigator) {
               });
           });
         }
-
-        // if (process.env.NODE_ENV === "production" && worker) {
-        //   Dialog.confirm({
-        //     title: "提示",
-        //     message: "有新内容可用；请刷新。",
-        //   }).then(() => {
-        //     navigator.serviceWorker
-        //       .getRegistration()
-        //       .then(() => {
-        //         skipWaiting(registration);
-        //       })
-        //       .then(() => {
-        //         window.location.reload();
-        //       });
-        //   });
-        // }
       },
       offline() {
         Notify({
@@ -97,7 +74,7 @@ if ("serviceWorker" in navigator) {
           type: "danger",
           message: `Service Worker 注册期间的错误：${error}`,
         });
-        // unregister(); // 注册期间失败直接卸载sw
+        unregister(); // 注册期间失败直接卸载sw
         console.log(error, "error");
       },
     }
@@ -121,5 +98,27 @@ function skipWaiting(registration: any) {
       }
     };
     worker.postMessage({ type: "skip-waiting" }, [channel.port2]);
+  });
+}
+
+function getNewAndOldVersion(worker: any) {
+  const url = new URL(worker?.scriptURL);
+  const params = new URLSearchParams(url.search);
+  const cacheVersion = params.get("cacheVersion") || "";
+  const oldCacheVersion = window.localStorage.getItem("cacheVersion");
+
+  return {
+    cacheVersion,
+    oldCacheVersion,
+  };
+}
+
+function clearCache() {
+  caches.keys().then(function (cacheList) {
+    return Promise.all(
+      cacheList.map(function (cacheName) {
+        return caches.delete(cacheName);
+      })
+    );
   });
 }

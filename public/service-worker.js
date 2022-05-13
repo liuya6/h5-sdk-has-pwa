@@ -1,24 +1,20 @@
-// importScripts(
-//   "https://storage.googleapis.com/workbox-cdn/releases/4.2.0/workbox-sw.js"
-// );
 importScripts(
   "https://cdn.bootcdn.net/ajax/libs/workbox-sw/6.5.3/workbox-sw.min.js"
 );
 
-console.log(workbox, "workbox");
-
 if (workbox) {
-  console.log("come in workbox");
-
+  console.log("workbox加载成功。");
   self.addEventListener("message", (event) => {
-    console.log(event, "!!!");
     const replyPort = event.ports[0];
     const message = event.data;
     if (replyPort && message && message.type === "skip-waiting") {
       event.waitUntil(
         self
           .skipWaiting()
-          .then(() => replyPort.postMessage({ error: null }))
+          .then(() => {
+            workbox.core.clientsClaim();
+            replyPort.postMessage({ error: null });
+          })
           .catch((error) => replyPort.postMessage({ error }))
       );
     }
@@ -36,44 +32,21 @@ if (workbox) {
     runtime: "runtime",
   });
 
-  // 预缓存
-  workbox.precaching.precacheAndRoute([
-    {
-      url: "/index.html",
-      revision: "1.0.0",
-    },
-  ]);
-
   // 跳过等待期
   // workbox.core.skipWaiting();
   // 一旦激活就开始控制任何现有客户机（通常是与skipWaiting配合使用）
-  workbox.core.clientsClaim();
+  // workbox.core.clientsClaim();
 
   // 删除过期缓存
   workbox.precaching.cleanupOutdatedCaches();
 
-  // html的缓存策略
-  // workbox.routing.registerRoute(
-  //   new RegExp("/"),
-  //   new workbox.strategies.NetworkFirst({
-  //     // 缓存自定义名称
-  //     cacheName: "html-caches",
-  //     plugins: [
-  //       // 需要缓存的状态筛选
-  //       new workbox.CacheableResponsePlugin({
-  //         statuses: [0, 200],
-  //       }),
-  //       // 缓存时间（秒）
-  //       new workbox.ExpirationPlugin({
-  //         // 最大缓存数量
-  //         maxEntries: 20,
-  //         // 缓存时间12小时
-  //         maxAgeSeconds: 12 * 60 * 60,
-  //       }),
-  //     ],
-  //   }),
-  //   "GET"
-  // );
+  // 预缓存 index.html
+  workbox.precaching.precacheAndRoute([
+    {
+      url: "/index.html",
+      revision: "1.0.1",
+    },
+  ]);
 
   // js css的缓存策略
   workbox.routing.registerRoute(
@@ -94,6 +67,7 @@ if (workbox) {
     })
   );
 
+  // api接口的缓存策略
   workbox.routing.registerRoute(
     /\/api/,
     new workbox.strategies.NetworkFirst({
@@ -116,6 +90,7 @@ if (workbox) {
     })
   );
 
+  // 图片的缓存策略
   workbox.routing.registerRoute(
     /\.(jpe?g|png|svg)/,
     new workbox.strategies.CacheFirst({
@@ -133,21 +108,4 @@ if (workbox) {
       ],
     })
   );
-
-  workbox.routing.registerRoute(
-    /^https:\/\/p2.music.126\.net\/.*\.(jpe?g|png)/,
-    new workbox.strategies.CacheFirst({
-      cacheName: "cors-image-cache",
-      fetchOptions: {
-        mode: "cors",
-      },
-      // 假设图片资源缓存的存取需要忽略请求 URL 的 search 参数，可以通过设置 matchOptions 来实现
-      matchOptions: {
-        ignoreSearch: true,
-      },
-    })
-  );
 }
-
-// 1 sw怎么删除所有缓存
-// 2 workbox怎么导入

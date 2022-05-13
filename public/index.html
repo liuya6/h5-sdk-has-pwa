@@ -97,6 +97,15 @@
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
     <div id="app"></div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.14.6/vconsole.min.js"></script>
+    <script>
+      var vConsole = new VConsole({
+        disableLogScrolling: false,
+        // onReady: () => {
+        //   vConsole.show();
+        // }
+      });
+    </script>
     <!-- built files will be auto injected -->
   </body>
 </html>
