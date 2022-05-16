@@ -2,7 +2,7 @@ import { register, unregister } from "register-service-worker";
 
 import { Dialog, Notify } from "vant";
 
-const cacheVersion = "v1.1.1";
+const cacheVersion = "v1.1.2";
 
 if ("serviceWorker" in navigator) {
   // unregister();
