@@ -2,7 +2,7 @@ import { register, unregister } from "register-service-worker";
 
 import { Dialog, Notify } from "vant";
 
-const cacheVersion = "v1.1.2";
+const cacheVersion = "v1.2.1";
 
 if ("serviceWorker" in navigator) {
   // unregister();
@@ -23,6 +23,8 @@ if ("serviceWorker" in navigator) {
           type: "success",
           message: "service worker 已注册",
         });
+        const { cacheVersion } = getNewAndOldVersion(registration.active);
+        window.localStorage.setItem("cacheVersion", cacheVersion);
       },
       cached() {
         Notify({
@@ -39,8 +41,8 @@ if ("serviceWorker" in navigator) {
       },
       updated(registration) {
         const worker = registration.waiting;
+        const { cacheVersion, oldCacheVersion } = getNewAndOldVersion(worker);
         if (worker) {
-          const { cacheVersion, oldCacheVersion } = getNewAndOldVersion(worker);
           // 要更新的sw版本和正在使用的sw版本一致就return出去
           if (cacheVersion === oldCacheVersion) return;
 
@@ -61,6 +63,8 @@ if ("serviceWorker" in navigator) {
                 window.location.reload();
               });
           });
+        } else {
+          window.localStorage.setItem("cacheVersion", cacheVersion);
         }
       },
       offline() {

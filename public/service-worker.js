@@ -3,6 +3,10 @@ importScripts(
 );
 
 if (workbox) {
+  const url = new URL(self.serviceWorker.scriptURL);
+  const params = new URLSearchParams(url.search);
+  const cacheVersion = params.get("cacheVersion") || "v1.0.0";
+
   console.log("workbox加载成功。");
   self.addEventListener("message", (event) => {
     const replyPort = event.ports[0];
@@ -40,11 +44,12 @@ if (workbox) {
   // 删除过期缓存
   workbox.precaching.cleanupOutdatedCaches();
 
+  console.log(cacheVersion, "cacheVersion");
   // 预缓存 index.html
   workbox.precaching.precacheAndRoute([
     {
       url: "/index.html",
-      revision: "1.0.1",
+      revision: cacheVersion,
     },
   ]);
 
